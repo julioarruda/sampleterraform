@@ -8,7 +8,7 @@ jobs:
     runs-on: ubuntu-latest
     defaults:
       run:
-        working-directory: ${{ GITHUB_WORKSPACE }}/appservice
+        working-directory: ${{ github.workspace }}/appservice
     steps:
       - uses: actions/checkout@v2
       
