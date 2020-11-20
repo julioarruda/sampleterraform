@@ -20,11 +20,6 @@ jobs:
     steps:
       - uses: actions/checkout@v2
 
-      - name: Azure Login
-        uses: azure/login@v1
-        with:
-          creds: ${{ secrets.AZURE_CREDENTIALS }}
-
       - uses: hashicorp/setup-terraform@v1
       
       - name: Terraform Init
@@ -50,4 +45,4 @@ jobs:
         with:
           azcliversion: 2.0.72
           inlineScript: |
-            az storage blob upload -f terraform.tfstate -c sample -n tfstatus
+            az storage blob upload -f terraform.tfstate -c sample -n tfstatus --connection-string ${{ secrets.AZ_STORAGE_CONNECTION_STRING }} 
