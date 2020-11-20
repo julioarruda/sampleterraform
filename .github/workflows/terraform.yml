@@ -11,6 +11,11 @@ jobs:
         working-directory: ${{ github.workspace }}/appservice
     steps:
       - uses: actions/checkout@v2
+
+      - name: Login to Azure
+        uses: azure/login@v1
+        with:
+          creds: ${{secrets.AZURE_CREDENTIALS}} 
       
       - uses: hashicorp/setup-terraform@v1
       
