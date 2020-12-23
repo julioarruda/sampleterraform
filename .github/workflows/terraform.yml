@@ -20,7 +20,7 @@ jobs:
       
     environment:
       name: dev
-      url: ${{ steps.output.outputs.app_url  }}
+      
     steps:
       - uses: actions/checkout@v2
 
@@ -49,9 +49,6 @@ jobs:
         run: |
          URL=$(terraform output app_service_default_hostname)
          echo "::set-output name=app_url::$URL"
-      
-      - name: Test
-        run: ls
 
       - name: Azure Login
         uses: azure/login@v1
@@ -64,5 +61,5 @@ jobs:
           azcliversion: 2.0.72
           inlineScript: |
             ls
-            az storage blob upload -f terraform.tfstate -c tfstatus -n sample
+            az storage blob upload -f appservice/terraform.tfstate -c tfstatus -n sample
          
