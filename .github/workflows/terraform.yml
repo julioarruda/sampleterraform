@@ -45,9 +45,9 @@ jobs:
       - name: 'Use Terraform Output'
         id: output
         run: |
-         url=$(terraform output app_service_default_hostname)
-         echo $url
-         echo '::set-output name=app_url::$url'
+         URL=$(terraform output app_service_default_hostname)
+         echo $URL
+         echo "::set-output name=app_url::$URL"
          
       
 
