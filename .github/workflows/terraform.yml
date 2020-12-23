@@ -39,11 +39,15 @@ jobs:
       - name: Terraform Apply
         run: terraform apply -auto-approve -var "prefix=sample-dev"
   
-      - name: Terraform Output
-        id: output
-        run: terraform output  
- 
+
       - name: 'Use Terraform Output'
-        run: echo ${{ steps.output.outputs.app_service_default_hostname  }}
+        id: output
+        run: |
+         url=$(terraform output app_service_default_hostname)
+         echo '::set-output name=app_url::$url'
+         
       
-  
+
+      - name: 'teste'
+        run: |
+         echo ${{ steps.output.outputs.app_url  }}
