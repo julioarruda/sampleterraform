@@ -4,7 +4,7 @@ on:
   workflow_dispatch:
 
 jobs:
-  deploy:
+  deploy-dev:
     runs-on: ubuntu-latest
     
     defaults:
@@ -16,7 +16,8 @@ jobs:
       ARM_CLIENT_SECRET: ${{ secrets.TF_ARM_CLIENT_SECRET }}
       ARM_SUBSCRIPTION_ID: ${{ secrets.TF_ARM_SUBSCRIPTION_ID }}
       ARM_TENANT_ID: ${{ secrets.TF_ARM_TENNANT_ID }}    
-    
+    environment:
+      name: dev
     steps:
       - uses: actions/checkout@v2
 
@@ -36,6 +37,10 @@ jobs:
         continue-on-error: true
   
       - name: Terraform Apply
+        id: terraform
         run: terraform apply -auto-approve -var "prefix=sample-dev"
+  
+      - name: 'Use Terraform Output'
+        run: echo ${{ steps.terraform.outputs.tf_actions_output  }}
       
   
