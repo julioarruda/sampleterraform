@@ -63,6 +63,6 @@ jobs:
         with:
           azcliversion: 2.0.72
           inlineScript: |
-            az account show
+            ls
             az storage blob upload -f terraform.tfstate -c tfstatus -n sample
          
