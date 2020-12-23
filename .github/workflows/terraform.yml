@@ -39,6 +39,9 @@ jobs:
       - name: Terraform Apply
         run: terraform apply -auto-approve -var "prefix=sample-dev"
   
+      - name: Terraform Output
+        run: terraform output
+  
  
       - name: 'Use Terraform Output'
         run: echo ${{ steps.plan.outputs.app_service_default_hostname  }}
