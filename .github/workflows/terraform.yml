@@ -34,7 +34,7 @@ jobs:
         with:
           azcliversion: 2.0.72
           inlineScript: |
-            az storage blob download-batch -d appservice --pattern terraform.tfstate -s sample
+            az storage blob download-batch -d appservice --pattern terraform.tfstate -s ${{ secrets.CONTAINER_NAME }}
 
       - uses: hashicorp/setup-terraform@v1
         with:
@@ -61,5 +61,123 @@ jobs:
         with:
           azcliversion: 2.0.72
           inlineScript: |
-            az storage blob upload-batch -d sample -s appservice --pattern *.tfstate
-         
+            az storage blob upload-batch -d ${{ secrets.CONTAINER_NAME }} -s appservice --pattern *.tfstate
+   
+  deploy-hmg:
+    runs-on: ubuntu-latest
+    
+    defaults:
+      run:
+        working-directory: ${{ github.workspace }}/appservice
+    
+    env:
+      ARM_CLIENT_ID: ${{ secrets.TF_ARM_CLIENT_ID }}
+      ARM_CLIENT_SECRET: ${{ secrets.TF_ARM_CLIENT_SECRET }}
+      ARM_SUBSCRIPTION_ID: ${{ secrets.TF_ARM_SUBSCRIPTION_ID }}
+      ARM_TENANT_ID: ${{ secrets.TF_ARM_TENNANT_ID }}    
+      AZURE_STORAGE_CONNECTION_STRING: ${{ secrets.STORAGE_CONNSTRING }}
+      
+    environment:
+      name: hmg
+    needs: deploy-dev
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Azure Login
+        uses: azure/login@v1
+        with:
+          creds: ${{ secrets.AZURE_CREDENTIALS }}
+
+      - name: Download TF State
+        uses: azure/CLI@v1
+        with:
+          azcliversion: 2.0.72
+          inlineScript: |
+            az storage blob download-batch -d appservice --pattern terraform.tfstate -s ${{ secrets.CONTAINER_NAME }}
+
+      - uses: hashicorp/setup-terraform@v1
+        with:
+          terraform_wrapper: false
+      
+      - name: Terraform Init
+        id: init
+        run: terraform init
+
+      - name: Terraform Validate
+        id: validate
+        run: terraform validate -no-color
+
+      - name: Terraform Plan
+        id: plan
+        run: terraform plan -no-color -var "prefix=${{ secrets.RESOURCE_PREFIX }}" -lock=false
+        continue-on-error: true
+  
+      - name: Terraform Apply
+        run: terraform apply -auto-approve -var "prefix=${{ secrets.RESOURCE_PREFIX }}" -lock=false
+
+      - name: Upload TF State
+        uses: azure/CLI@v1
+        with:
+          azcliversion: 2.0.72
+          inlineScript: |
+            az storage blob upload-batch -d ${{ secrets.CONTAINER_NAME }} -s appservice --pattern *.tfstate
+
+
+  deploy-prd:
+    runs-on: ubuntu-latest
+    
+    defaults:
+      run:
+        working-directory: ${{ github.workspace }}/appservice
+    
+    env:
+      ARM_CLIENT_ID: ${{ secrets.TF_ARM_CLIENT_ID }}
+      ARM_CLIENT_SECRET: ${{ secrets.TF_ARM_CLIENT_SECRET }}
+      ARM_SUBSCRIPTION_ID: ${{ secrets.TF_ARM_SUBSCRIPTION_ID }}
+      ARM_TENANT_ID: ${{ secrets.TF_ARM_TENNANT_ID }}    
+      AZURE_STORAGE_CONNECTION_STRING: ${{ secrets.STORAGE_CONNSTRING }}
+      
+    environment:
+      name: prd
+    needs: deploy-hmg
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Azure Login
+        uses: azure/login@v1
+        with:
+          creds: ${{ secrets.AZURE_CREDENTIALS }}
+
+      - name: Download TF State
+        uses: azure/CLI@v1
+        with:
+          azcliversion: 2.0.72
+          inlineScript: |
+            az storage blob download-batch -d appservice --pattern terraform.tfstate -s ${{ secrets.CONTAINER_NAME }}
+
+      - uses: hashicorp/setup-terraform@v1
+        with:
+          terraform_wrapper: false
+      
+      - name: Terraform Init
+        id: init
+        run: terraform init
+
+      - name: Terraform Validate
+        id: validate
+        run: terraform validate -no-color
+
+      - name: Terraform Plan
+        id: plan
+        run: terraform plan -no-color -var "prefix=${{ secrets.RESOURCE_PREFIX }}" -lock=false
+        continue-on-error: true
+  
+      - name: Terraform Apply
+        run: terraform apply -auto-approve -var "prefix=${{ secrets.RESOURCE_PREFIX }}" -lock=false
+
+      - name: Upload TF State
+        uses: azure/CLI@v1
+        with:
+          azcliversion: 2.0.72
+          inlineScript: |
+            az storage blob upload-batch -d ${{ secrets.CONTAINER_NAME }} -s appservice --pattern *.tfstate
