@@ -60,5 +60,5 @@ jobs:
         with:
           azcliversion: 2.0.72
           inlineScript: |
-            az storage blob upload-batch -d sample -s appservice
+            az storage blob upload-batch -d sample -s appservice --pattern *.tfstate
          
