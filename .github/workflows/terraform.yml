@@ -29,7 +29,7 @@ jobs:
         with:
           creds: ${{ secrets.AZURE_CREDENTIALS }}
 
-      - name: Azure CLI script
+      - name: Download TF State
         uses: azure/CLI@v1
         with:
           azcliversion: 2.0.72
@@ -56,13 +56,7 @@ jobs:
       - name: Terraform Apply
         run: terraform apply -auto-approve -var "prefix=${{ secrets.RESOURCE_PREFIX }}" -lock=false
 
-      - name: 'Use Terraform Output'
-        id: output
-        run: |
-         URL=$(terraform output app_service_default_hostname)
-         echo "::set-output name=app_url::$URL"
-
-      - name: Azure CLI script
+      - name: Upload TF State
         uses: azure/CLI@v1
         with:
           azcliversion: 2.0.72
