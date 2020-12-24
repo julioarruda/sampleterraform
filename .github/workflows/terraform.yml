@@ -34,7 +34,7 @@ jobs:
         with:
           azcliversion: 2.0.72
           inlineScript: |
-            az storage blob download-batch -d . --pattern terraform.tfstate -s sample
+            az storage blob download-batch -d appservice --pattern terraform.tfstate -s sample
 
       - uses: hashicorp/setup-terraform@v1
         with:
