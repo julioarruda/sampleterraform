@@ -27,8 +27,6 @@ resource "azurerm_app_service" "main" {
   app_service_plan_id = azurerm_app_service_plan.main.id
 
   site_config {
-    dotnet_framework_version = "v4.0"
-    remote_debugging_enabled = true
-    remote_debugging_version = "VS2019"
+    linux_fx_version = "DOTNETCORE|3.1"
   }
 }
