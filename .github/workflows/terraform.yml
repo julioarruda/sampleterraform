@@ -151,7 +151,11 @@ jobs:
       name: hmg
     needs: deploy-dev-infra
     steps:
-      - uses: actions/checkout@v2
+      - name: Download Terraform
+        uses: actions/download-artifact@v2
+        with:
+          name: terraform
+          path: ${{ github.workspace }}//appservice
 
       - name: Azure Login
         uses: azure/login@v1
@@ -192,6 +196,33 @@ jobs:
           inlineScript: |
             az storage blob upload-batch -d ${{ secrets.CONTAINER_NAME }} -s appservice --pattern *.tfstate
 
+
+  deploy-hmg-app:
+     name: Deploy HMG App
+     runs-on: ubuntu-latest
+
+     environment:
+       name: dev 
+       url: ${{ steps.app-web.outputs.webapp-url }}
+     needs: deploy-hmg-infra
+     steps:
+       - name: Download App
+         uses: actions/download-artifact@v2
+         with:
+           name: app
+           path: ${{ github.workspace }}//app
+
+       - name: Azure Login
+         uses: azure/login@v1
+         with:
+           creds: ${{ secrets.AZURE_CREDENTIALS }}
+            
+       - name: 'Run Azure webapp deploy action using publish profile credentials'
+         uses: azure/webapps-deploy@v2
+         id: app-web
+         with: 
+           app-name: '${{ secrets.RESOURCE_PREFIX }}-appservice' 
+           package: '${{ github.workspace }}//app'
 
   deploy-prd-infra:
     runs-on: ubuntu-latest
@@ -211,7 +242,11 @@ jobs:
       name: prd
     needs: deploy-hmg-infra
     steps:
-      - uses: actions/checkout@v2
+      - name: Download Terraform
+        uses: actions/download-artifact@v2
+        with:
+          name: terraform
+          path: ${{ github.workspace }}//appservice
 
       - name: Azure Login
         uses: azure/login@v1
@@ -251,3 +286,31 @@ jobs:
           azcliversion: 2.0.72
           inlineScript: |
             az storage blob upload-batch -d ${{ secrets.CONTAINER_NAME }} -s appservice --pattern *.tfstate
+
+
+  deploy-prd-app:
+     name: Deploy PRD App
+     runs-on: ubuntu-latest
+
+     environment:
+       name: prd 
+       url: ${{ steps.app-web.outputs.webapp-url }}
+     needs: deploy-prd-infra
+     steps:
+       - name: Download App
+         uses: actions/download-artifact@v2
+         with:
+           name: app
+           path: ${{ github.workspace }}//app
+
+       - name: Azure Login
+         uses: azure/login@v1
+         with:
+           creds: ${{ secrets.AZURE_CREDENTIALS }}
+            
+       - name: 'Run Azure webapp deploy action using publish profile credentials'
+         uses: azure/webapps-deploy@v2
+         id: app-web
+         with: 
+           app-name: '${{ secrets.RESOURCE_PREFIX }}-appservice' 
+           package: '${{ github.workspace }}//app'
