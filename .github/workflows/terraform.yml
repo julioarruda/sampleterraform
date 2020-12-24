@@ -112,7 +112,7 @@ jobs:
 
      environment:
        name: dev 
-       url: ${{ steps.app-web.outputs.webapp-url }}
+       
      needs: deploy-dev-infra
      steps:
        - name: Download App
@@ -203,7 +203,7 @@ jobs:
 
      environment:
        name: hmg 
-       url: ${{ steps.app-web.outputs.webapp-url }}
+       
      needs: deploy-hmg-infra
      steps:
        - name: Download App
@@ -294,7 +294,7 @@ jobs:
 
      environment:
        name: prd 
-       url: ${{ steps.app-web.outputs.webapp-url }}
+       
      needs: deploy-prd-infra
      steps:
        - name: Download App
