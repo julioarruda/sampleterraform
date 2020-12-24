@@ -202,7 +202,7 @@ jobs:
      runs-on: ubuntu-latest
 
      environment:
-       name: dev 
+       name: hmg 
        url: ${{ steps.app-web.outputs.webapp-url }}
      needs: deploy-hmg-infra
      steps:
