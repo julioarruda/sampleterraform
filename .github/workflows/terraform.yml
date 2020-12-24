@@ -38,7 +38,8 @@ jobs:
           name: terraform
           path: ${{ github.workspace }}//appservice
           
-  deploy-dev:
+  deploy-dev-infra:
+    name: Deploy Infra Dev
     runs-on: ubuntu-latest
     
     defaults:
@@ -58,7 +59,11 @@ jobs:
     needs: build
       
     steps:
-      - uses: actions/checkout@v2
+      - name: Download Terraform
+        uses: actions/download-artifact@v2
+        with:
+          name: terraform
+          path: ${{ github.workspace }}//appservice
 
       - name: Azure Login
         uses: azure/login@v1
@@ -98,8 +103,39 @@ jobs:
           azcliversion: 2.0.72
           inlineScript: |
             az storage blob upload-batch -d ${{ secrets.CONTAINER_NAME }} -s appservice --pattern *.tfstate
+
+
+
+  deploy-dev-app:
+     name: Deploy Dev
+     runs-on: ubuntu-latest
+     env:
+      NOME_WEBAPP_AZURE: ${{ secrets.RESOURCE_PREFIX }}-appservice
+     environment:
+       name: dev 
+       url: ${{ steps.app-web.outputs.webapp-url }}
+     needs: deploy-dev-infra
+     steps:
+       - name: Download App
+         uses: actions/download-artifact@v2
+         with:
+           name: app
+           path: ${{ github.workspace }}//app
+
+       - name: Azure Login
+         uses: azure/login@v1
+         with:
+           creds: ${{ secrets.AZURE_CREDENTIALS }}
+            
+       - name: 'Run Azure webapp deploy action using publish profile credentials'
+         uses: azure/webapps-deploy@v2
+         id: app-web
+         with: 
+           app-name: ${{ env.AZURE_WEBAPP_NAME }} 
+           package: '${{ github.workspace }}//app'
+           slot-name: 'dev'
    
-  deploy-hmg:
+  deploy-hmg-infra:
     runs-on: ubuntu-latest
     
     defaults:
@@ -115,7 +151,7 @@ jobs:
       
     environment:
       name: hmg
-    needs: deploy-dev
+    needs: deploy-dev-infra
     steps:
       - uses: actions/checkout@v2
 
@@ -159,7 +195,7 @@ jobs:
             az storage blob upload-batch -d ${{ secrets.CONTAINER_NAME }} -s appservice --pattern *.tfstate
 
 
-  deploy-prd:
+  deploy-prd-infra:
     runs-on: ubuntu-latest
     
     defaults:
@@ -175,7 +211,7 @@ jobs:
       
     environment:
       name: prd
-    needs: deploy-hmg
+    needs: deploy-hmg-infra
     steps:
       - uses: actions/checkout@v2
 
