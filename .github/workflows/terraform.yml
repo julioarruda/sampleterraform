@@ -60,6 +60,5 @@ jobs:
         with:
           azcliversion: 2.0.72
           inlineScript: |
-            ls
-            az storage blob upload -f appservice/terraform.tfstate -c sample
+            az storage blob upload-batch -d sample -s appservice
          
