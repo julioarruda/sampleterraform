@@ -28,6 +28,6 @@ resource "azurerm_app_service" "main" {
   app_service_plan_id = azurerm_app_service_plan.main.id
 
   site_config {
-    dotnet_core_version = "v5.0"
+    linux_fx_version = "DOTNET|5.0"
   }
 }
