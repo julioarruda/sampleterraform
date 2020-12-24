@@ -107,7 +107,7 @@ jobs:
 
 
   deploy-dev-app:
-     name: Deploy Dev
+     name: Deploy Dev App
      runs-on: ubuntu-latest
      env:
       NOME_WEBAPP_AZURE: ${{ secrets.RESOURCE_PREFIX }}-appservice
@@ -133,7 +133,6 @@ jobs:
          with: 
            app-name: ${{ env.AZURE_WEBAPP_NAME }} 
            package: '${{ github.workspace }}//app'
-           slot-name: 'dev'
    
   deploy-hmg-infra:
     runs-on: ubuntu-latest
