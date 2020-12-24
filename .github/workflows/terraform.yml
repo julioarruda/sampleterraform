@@ -109,8 +109,7 @@ jobs:
   deploy-dev-app:
      name: Deploy Dev App
      runs-on: ubuntu-latest
-     env:
-      NOME_WEBAPP_AZURE: ${{ secrets.RESOURCE_PREFIX }}-appservice
+
      environment:
        name: dev 
        url: ${{ steps.app-web.outputs.webapp-url }}
@@ -131,7 +130,7 @@ jobs:
          uses: azure/webapps-deploy@v2
          id: app-web
          with: 
-           app-name: ${{ env.AZURE_WEBAPP_NAME }} 
+           app-name: '${{ secrets.RESOURCE_PREFIX }}-appservice' 
            package: '${{ github.workspace }}//app'
    
   deploy-hmg-infra:
