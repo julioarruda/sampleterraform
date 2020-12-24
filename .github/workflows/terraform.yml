@@ -54,7 +54,7 @@ jobs:
         continue-on-error: true
   
       - name: Terraform Apply
-        run: terraform apply -auto-approve -var "prefix=${{ secrets.RESOURCE_PREFIX }}"  
+        run: terraform apply -auto-approve -var "prefix=${{ secrets.RESOURCE_PREFIX }}" -lock=false
 
       - name: 'Use Terraform Output'
         id: output
